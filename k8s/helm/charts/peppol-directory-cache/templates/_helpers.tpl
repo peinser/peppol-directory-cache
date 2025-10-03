@@ -22,34 +22,7 @@ imagePullSecrets:
 A template returning the name of a service.
 */}}
 {{- define "service.name" -}}
-{{- printf "%s-service-%s" .release.Name .name -}}
-{{- end -}}
-
-
-{{/*
-A default template for generating services.
-*/}}
-{{- define "service.svc" -}}
-{{- $name := include "service.name" (dict "release" .release "name" .name) | kebabcase | lower -}}
-{{- with .service -}}
-{{- if .enabled -}}
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ $name }}
-  labels:
-    app.kubernetes.io/name: {{ $name }}
-    app.kubernetes.io/instance: {{ $.release.Name }}
-spec:
-  selector:
-    app: {{ $name }}
-  ports:
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: {{ .targetPort | default 8000 }}
-{{- end -}}
-{{- end -}}
+{{- printf "%s-service-%s" .release .name -}}
 {{- end -}}
 
 

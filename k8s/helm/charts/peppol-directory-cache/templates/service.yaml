@@ -1,4 +1,4 @@
-{{- $name := include "service.name" (dict "release" $.release.Name "name" "peppol-directory-cache") | kebabcase | lower -}}
+{{- $name := include "service.name" (dict "release" $.Release.Name "name" "peppol-directory-cache") | kebabcase | lower -}}
 
 apiVersion: v1
 kind: Service
@@ -6,7 +6,7 @@ metadata:
   name: {{ $name }}
   labels:
     app.kubernetes.io/name: {{ $name }}
-    app.kubernetes.io/instance: {{ $.release.Name }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
 spec:
   selector:
     app: {{ $name }}

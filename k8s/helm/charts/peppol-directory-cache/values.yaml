@@ -23,11 +23,7 @@ defaults:
     #   tls: true
     whitelist: null
     defaultAnnotations:
-      # Gzip compression settings
-      nginx.ingress.kubernetes.io/enable-gzip: "true"
-      nginx.ingress.kubernetes.io/gzip-min-length: "256"
-      nginx.ingress.kubernetes.io/gzip-types: "text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml"
-      # Optimized proxy settings
+      # Proxy settings for compatibility
       nginx.ingress.kubernetes.io/proxy-body-size: "8m"
       nginx.ingress.kubernetes.io/proxy-buffering: "on"
       nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
@@ -40,10 +36,8 @@ defaults:
       nginx.ingress.kubernetes.io/add-header-x-content-type-options: "nosniff"
       nginx.ingress.kubernetes.io/add-header-x-xss-protection: "1; mode=block"
       # Rate limiting
-      nginx.ingress.kubernetes.io/limit-rps: "512"
-      nginx.ingress.kubernetes.io/limit-burst-multiplier: "2"
-      # Cache control
-      nginx.ingress.kubernetes.io/add-header-cache-control: "public, max-age=3600"
+      nginx.ingress.kubernetes.io/limit-rps: "4096"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
   ## Default deployment autoscaling configuration.
   ##
   autoscaling:
@@ -153,6 +147,3 @@ image:
   ## Enable development (debug) mode.
   ##
   debug: false
-## Number of replicas.
-##
-replicas: 1
