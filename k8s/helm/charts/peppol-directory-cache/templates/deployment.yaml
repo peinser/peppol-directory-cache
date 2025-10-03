@@ -1,4 +1,4 @@
-{{- $deployment := include "service.name" (dict "release" $.Release "name" "peppol-directory-cache") }}
+{{- $deployment := include "service.name" (dict "release" $.Release.Name "name" "peppol-directory-cache") }}
 
 apiVersion: apps/v1
 kind: Deployment
