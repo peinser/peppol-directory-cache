@@ -6,7 +6,7 @@ LABEL maintainer="Joeri Hermans <joeri@peinser.com>"
 
 EXPOSE 8000
 
-RUN mkdir -p /var/logs/nginx
+RUN mkdir -p /var/cache/nginx
 
 COPY ./nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
 
@@ -14,9 +14,9 @@ COPY ./nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
 RUN groupadd -g 1001 peppol && \
     useradd -u 1001 -g peppol -s /bin/false -M peppol && \
     # Create required directories with correct ownership
-    mkdir -p /var/cache/nginx /var/logs/nginx && \
-    chown -R peppol:peppol /var/cache/nginx /var/logs/nginx && \
-    chmod -R 750 /var/cache/nginx /var/logs/nginx && \
+    mkdir -p /var/cache/nginx && \
+    chown -R peppol:peppol /var/cache/nginx && \
+    chmod -R 750 /var/cache/nginx && \
     # Adjust OpenResty/Nginx directories for rootless access
     chown -R peppol:peppol /usr/local/openresty && \
     chmod -R 750 /usr/local/openresty
