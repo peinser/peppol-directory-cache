@@ -1,52 +1,51 @@
+
 # Peppol Directory Cache
 
-## Purpose
+## Overview
 
-This utility acts as a caching proxy for the [Peppol Directory](https://directory.peppol.eu/search/1.0/json), designed to extract Peppol Participant IDs and their registered document types. It is intended to accelerate and stabilize access to Peppol information, especially for use cases such as invoice generation, where up-to-date participant data is required.
+Peppol Directory Cache is a lightweight caching proxy for the [Peppol Directory](https://directory.peppol.eu/search/1.0/json). It extracts Peppol Participant IDs and their registered document types, enabling fast, reliable lookups during invoice and credit-note generation.
 
-### Typical Usage
+> **Why is this increasingly important?**
 
-During invoice generation, this service is queried with parameters such as `q=BE&q={CompanyNumber}` to fetch Peppol information for a specific company. The cache ensures that repeated lookups for the same company are served quickly and reliably, reducing load on the Peppol Directory and mitigating rate limits.
+The Peppol landscape is rapidly evolving, with Access Points and participants adopting different document types, processes, and even legacy schemes. In the future, it will be essential to select the correct UBL document type and Participant ID for each client—some may only support specific types (e.g., credit-notes only), or use legacy scheme IDs such as `0208`. Failing to do so can result in undeliverable invoices or compliance issues. This fragmentation means services like this cache are critical for reliably determining what your client actually supports, ensuring seamless and correct electronic document exchange.
 
-## Caching Controls
+## Why Use This Utility?
 
-- **Write-through cache:** The service caches responses from the Peppol Directory for a configurable period (default: 1 year for HTTP 200 responses).
-- **Explicit cache purging:** It is recommended to implement cache purging logic, especially when participant data changes or becomes stale. See TODO below.
-- **Initial load:** For large client bases, consider pre-populating the cache with relevant participant data to avoid rate limits and slow startup times.
+- **Performance:** Reduces latency and load on the Peppol Directory by caching responses for repeated queries.
+- **Reliability:** Mitigates rate limiting and service interruptions from the upstream directory.
+- **Correctness:** Ensures you generate the right UBL document type for each client, even as the Peppol landscape fragments.
 
-## Operational Recommendations
+## How It Works
 
-- **Single instance purging:** In enterprise deployments, ensure that only one instance is responsible for purging the cache. Multiple instances purging simultaneously may trigger rate limiting by the Peppol Directory and degrade service reliability.
-- **Rate limiting:** The Peppol Directory enforces rate limits. Avoid bulk queries or frequent cache purges from multiple sources.
+During invoice or credit-note generation, query the cache with parameters like `q=BE&q={CompanyNumber}`. The cache will return Peppol information for the specified company, including supported document types. This helps you select the correct UBL type for each transaction.
 
-## TODO
+## Caching Controls & Recommendations
 
-- [ ] Implement explicit cache purging controls for specific query arguments.
-- [ ] Add scripts for initial load and cache management.
-
-## References
-
-- [Peppol Directory API](https://directory.peppol.eu/search/1.0/json)
+- **Write-through cache:** Responses are cached for a configurable period (default: 1 year for HTTP 200 responses).
+- **Explicit cache purging:** Implement cache purging logic for stale or changed participant data. (See TODO)
+- **Initial load:** For large client bases, pre-populate the cache to avoid rate limits and slow startup.
+- **Single instance purging:** Only one instance should purge the cache in enterprise deployments to avoid rate limiting.
+- **Rate limiting:** Avoid bulk queries or frequent purges from multiple sources.
 
 ## Example Queries
 
-Below are example `curl` commands to query Peppol information for well-known companies using this cache service:
+Query Peppol information for well-known companies:
 
 ### Belgian government (Company Number: 0203.201.340)
 
-```
+```bash
 curl -s "http://<your-cache-host>:8000?q=BE&q=0203201340"
 ```
 
 ### KBC Bank NV (Company Number: 0403.227.515)
 
-```
+```bash
 curl -s "http://<your-cache-host>:8000?q=BE&q=0403227515"
 ```
 
 ### Proximus NV (Company Number: 0202.239.951)
 
-```
+```bash
 curl -s "http://<your-cache-host>:8000?q=BE&q=0202239951"
 ```
 
@@ -63,8 +62,6 @@ docker pull harbor.peinser.com/library/peppol-directory-cache:0.0.1
 ```
 
 ### Build Locally
-
-Clone the repository and build the image:
 
 ```bash
 git clone https://github.com/peinser/peppol-directory-cache.git
@@ -83,5 +80,14 @@ docker run -p 8000:8000 peppol-directory-cache:local
 Helm charts are provided in `k8s/helm/charts/peppol-directory-cache`.
 
 ```bash
-helm install my-peppol-cache k8s/helm/charts/peppol-directory-cache  --set defaults.ingress.enabled=false
+helm install my-peppol-cache k8s/helm/charts/peppol-directory-cache --set defaults.ingress.enabled=false
 ```
+
+## TODO
+
+- [ ] Implement explicit cache purging controls for specific query arguments.
+- [ ] Add scripts for initial load and cache management.
+
+## References
+
+- [Peppol Directory API](https://directory.peppol.eu/search/1.0/json)
