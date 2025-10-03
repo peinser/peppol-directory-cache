@@ -103,6 +103,7 @@ helm install my-peppol-cache k8s/helm/charts/peppol-directory-cache --set defaul
 
 - [ ] Implement explicit cache purging controls for specific query arguments.
 - [ ] Add scripts for initial load and cache management.
+- [ ] PVC allocation for the nginx cache.
 
 ## References
 
