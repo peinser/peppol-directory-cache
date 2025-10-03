@@ -1,0 +1,73 @@
+{{- $deployment := include "service.name" (dict "release" $.Release "name" "peppol-directory-cache") }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ $deployment }}
+  name: {{ $deployment }}
+spec:
+  replicas: {{ include "deploy.replicas" .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ $deployment }}
+  template:
+    metadata:
+      labels:
+        app: {{ $deployment }}
+        {{- if .Values.defaults.loki.enabled }}
+        loki: {{ .Values.defaults.loki.tenant }}
+        {{- end }}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsUser: {{ .Values.defaults.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.defaults.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.defaults.securityContext.fsGroup }}
+
+      {{- include "service.constraints" $ | nindent 6 }}
+
+      dnsPolicy: {{ .Values.defaults.dnsPolicy }}
+      restartPolicy: {{ .Values.defaults.restartPolicy }}
+      {{ include "service.pullSecrets" $ | nindent 6 -}}
+
+      # volumes:
+      # - name: cache
+      #   configMap:
+      #     name: {{ printf "%s-cache" .Release.Name }}
+      #     items:
+      #     - key: cache.json
+      #       path: cache.json
+      # - name: oidc
+      #   configMap:
+      #     name: {{ printf "%s-oidc" .Release.Name }}
+      #     items:
+      #     - key: oidc.json
+      #       path: oidc.json
+
+      containers:
+
+      - image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ include "image" $ }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: {{ $deployment }}
+        securityContext:
+          allowPrivilegeEscalation: {{ .Values.defaults.securityContext.allowPrivilegeEscalation }}
+          privileged: {{ .Values.defaults.securityContext.privileged }}
+          runAsNonRoot: {{ .Values.defaults.securityContext.runAsNonRoot }}
+
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+
+        # volumeMounts:
+        # - name: cache
+        #   readOnly: true
+        #   mountPath: /mnt/config/cache.json
+        #   subPath: cache.json
+        # - name: oidc
+        #   readOnly: true
+        #   mountPath: /mnt/config/oidc.json
+        #   subPath: oidc.json
+
+        {{- include "probes" $ | nindent 8 }}
+\

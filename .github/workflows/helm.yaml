@@ -48,7 +48,7 @@ jobs:
 
       - name: 🔑 Authenticate to OCI registry
         run: |
-          echo '${{ secrets.OCI_REGISTRY_HARBOR_SECRET }}' | helm registry login -u '${{ secrets.OCI_REGISTRY_HARBOR_LOGIN }}' --password-stdin harbor.peinser.com/charge
+          echo '${{ secrets.OCI_REGISTRY_HARBOR_SECRET }}' | helm registry login -u '${{ secrets.OCI_REGISTRY_HARBOR_LOGIN }}' --password-stdin harbor.peinser.com
         env:
           HELM_EXPERIMENTAL_OCI: 1
 
@@ -72,7 +72,7 @@ jobs:
 
           echo "🚢 Pushing Helm charts to OCI..."
           ls _packaged | grep .tgz | while read package || [[ -n $package ]]; do
-            helm push _packaged/$package oci://harbor.peinser.com/charge/charts
+            helm push _packaged/$package oci://harbor.peinser.com/library/charts
             echo "⬆️ Pushed $package" >> $GITHUB_STEP_SUMMARY
           done
 

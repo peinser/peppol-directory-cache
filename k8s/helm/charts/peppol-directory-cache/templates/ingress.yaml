@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    {{- include "ingress.defaultAnnotations" $ | indent 4 }}
+  name: {{ .Release.Name }}-peppol-directory-cache
+spec:
+  ingressClassName: {{ .Values.defaults.ingress.ingressClassName | quote }}
+  tls:
+  - hosts:
+    {{- range $v := .Values.defaults.ingress.hosts }}
+    {{- if $v.tls }}
+    - {{ $v.dns | quote }}
+    {{- end }}
+    {{- end }}
+    secretName: {{ .Release.Name }}-ingress-tls
+  rules:
+  {{- range $v := .Values.defaults.ingress.hosts }}
+  - host: {{ $v.dns | quote }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ $.Release.Name }}-service-peppol-directory-cache
+            port:
+              number: 80
+  {{- end }}

@@ -153,3 +153,6 @@ image:
   ## Enable development (debug) mode.
   ##
   debug: false
+## Number of replicas.
+##
+replicas: 1
