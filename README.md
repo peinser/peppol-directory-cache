@@ -21,8 +21,32 @@ During invoice generation, this service is queried with parameters such as `q=BE
 
 ## TODO
 
-- [ ] Implement explicit cache purging controls
+- [ ] Implement explicit cache purging controls for specific query arguments
 
 ## References
 
 - [Peppol Directory API](https://directory.peppol.eu/search/1.0/json)
+
+## Example Queries
+
+Below are example `curl` commands to query Peppol information for well-known companies using this cache service:
+
+### Belgian government (Company Number: 0203.201.340)
+
+```
+curl -s "http://<your-cache-host>:8000?q=BE&q=0203201340"
+```
+
+### KBC Bank NV (Company Number: 0403.227.515)
+
+```
+curl -s "http://<your-cache-host>:8000?q=BE&q=0403227515"
+```
+
+### Proximus NV (Company Number: 0202.239.951)
+
+```
+curl -s "http://<your-cache-host>:8000?q=BE&q=0202239951"
+```
+
+Replace `<your-cache-host>` with the hostname or IP address of your deployed cache service.
