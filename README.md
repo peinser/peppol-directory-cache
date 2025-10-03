@@ -50,3 +50,37 @@ curl -s "http://<your-cache-host>:8000?q=BE&q=0202239951"
 ```
 
 Replace `<your-cache-host>` with the hostname or IP address of your deployed cache service.
+
+## Docker Image & Deployment
+
+You can use the official Docker image or build your own from this repository.
+
+### Pull from Registry
+
+```bash
+docker pull harbor.peinser.com/library/peppol-directory-cache:0.0.1
+```
+
+### Build Locally
+
+Clone the repository and build the image:
+
+```bash
+git clone https://github.com/peinser/peppol-directory-cache.git
+cd peppol-directory-cache
+docker build -f docker/Dockerfile -t peppol-directory-cache:local .
+```
+
+### Run the Container
+
+```bash
+docker run -p 8000:8000 peppol-directory-cache:local
+```
+
+### Kubernetes/Helm Deployment
+
+Helm charts are provided in `k8s/helm/charts/peppol-directory-cache`.
+
+```bash
+helm install my-peppol-cache k8s/helm/charts/peppol-directory-cache  --set defaults.ingress.enabled=false
+```
