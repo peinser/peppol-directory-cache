@@ -21,7 +21,8 @@ During invoice generation, this service is queried with parameters such as `q=BE
 
 ## TODO
 
-- [ ] Implement explicit cache purging controls for specific query arguments
+- [ ] Implement explicit cache purging controls for specific query arguments.
+- [ ] Add scripts for initial load and cache management.
 
 ## References
 
