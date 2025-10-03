@@ -51,7 +51,21 @@ curl -s "http://<your-cache-host>:8000?q=BE&q=0403227515"
 curl -s "http://<your-cache-host>:8000?q=BE&q=0202239951"
 ```
 
-Replace `<your-cache-host>` with the hostname or IP address of your deployed cache service.
+
+## Response Headers
+
+The service sets several HTTP headers to help clients understand cache behavior:
+
+- **X-Cache-Status**: Indicates cache result for the request. Possible values:
+	- `HIT`: Response was served from cache.
+	- `MISS`: Response was fetched from the Peppol Directory and cached.
+	- `BYPASS`: Cache was bypassed (e.g., due to request headers).
+	- `EXPIRED`: Cached response was expired and refreshed.
+	- `STALE`: Stale cached response was served (if allowed).
+- **Cache-Control**: Shows cache control directives from the client (for debugging).
+- **Request-URI**: Echoes the normalized request URI used as the cache key.
+
+These headers are useful for debugging, monitoring cache efficiency, and understanding how your requests are processed.
 
 ## Docker Image & Deployment
 
