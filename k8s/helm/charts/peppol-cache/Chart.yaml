@@ -1,0 +1,12 @@
+apiVersion: v2
+name: peppol-directory-cache
+description: A specification for the Peppol Directory cache.
+type: application
+version: 0.0.1
+appVersion: 0.0.1
+maintainers:
+  - name: Peinser BV
+    url: https://github.com/peinser
+sources:
+  - https://github.com/peinser
+  - https://directory.peppol.eu/search

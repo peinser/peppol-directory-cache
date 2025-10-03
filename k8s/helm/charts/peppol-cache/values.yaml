@@ -1,0 +1,155 @@
+## Copyright Peinser BV
+##
+
+## Global configuration that is applicable to all resources and will be used
+## as a default unless specifically overwritten.
+##
+defaults:
+  ## Default common pod properties.
+  ##
+  replicas: 1
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  ## Default ingress configuration.
+  ##
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    clusterIssuer: letsencrypt-production
+    maxBodySize: 8m
+    class: nginx
+    hosts: []
+    # - dns: charge.peinser.com
+    #   tls: true
+    whitelist: null
+    defaultAnnotations:
+      # Gzip compression settings
+      nginx.ingress.kubernetes.io/enable-gzip: "true"
+      nginx.ingress.kubernetes.io/gzip-min-length: "256"
+      nginx.ingress.kubernetes.io/gzip-types: "text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml"
+      # Optimized proxy settings
+      nginx.ingress.kubernetes.io/proxy-body-size: "8m"
+      nginx.ingress.kubernetes.io/proxy-buffering: "on"
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+      nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "90"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "90"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "90"
+      # Security headers
+      nginx.ingress.kubernetes.io/add-header-x-frame-options: "SAMEORIGIN"
+      nginx.ingress.kubernetes.io/add-header-x-content-type-options: "nosniff"
+      nginx.ingress.kubernetes.io/add-header-x-xss-protection: "1; mode=block"
+      # Rate limiting
+      nginx.ingress.kubernetes.io/limit-rps: "512"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "2"
+      # Cache control
+      nginx.ingress.kubernetes.io/add-header-cache-control: "public, max-age=3600"
+  ## Default deployment autoscaling configuration.
+  ##
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 90
+  ## Grafana Loki integration for log scraping.
+  ##
+  loki:
+    enabled: false
+    tenant: null
+  ## Default pod node selector.
+  ##
+  nodeSelector: {}
+  ## Default pod tolerations.
+  ##
+  tolerations: []
+  ## Default pod (anti) affinity.
+  affinity: {}
+  ## Container security context.
+  ##
+  securityContext:
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroup: 1001
+    allowPrivilegeEscalation: false
+    privileged: false
+    runAsNonRoot: true
+  ## Default pod resources configuration.
+  ##
+  resources:
+    requests:
+      cpu: 64m
+      memory: 256Mi
+    limits: {}
+  ## Probe configuration.
+  ##
+  probes:
+    ## Startup probe.
+    ##
+    startup:
+      enabled: true
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 25
+    ## Liveness probe.
+    ##
+    liveness:
+      enabled: true
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+      httpGet:
+        scheme: HTTP
+        path: /.info/healthz
+        port: 8000
+        ## It is also possible to configure HTTP Headers in the following way.
+        ##
+        ## httpHeaders:
+        ## - name: Authorization
+        ##   value: *probeAuthorization
+    ## Readiness probe.
+    ##
+    readiness:
+      enabled: true
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 5
+      httpGet:
+        scheme: HTTP
+        path: /.info/healthz
+        port: 8000
+        ## It is also possible to configure HTTP Headers in the following way.
+        ##
+        ## httpHeaders:
+        ## - name: Authorization
+        ##   value: *probeAuthorization
+## Image.
+## ref: https://github.com/peinser/charge-platform/releases
+##
+image:
+  registry: harbor.peinser.com
+  repository: library/peppol-directory-cache
+  tag: 0.0.1
+  digest: ""
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always'
+  ## ref: https://kubernetes.io/docs/concepts/containers/images/#pre-pulled-images
+  ##
+  pullPolicy: Always
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
+  ## Enable development (debug) mode.
+  ##
+  debug: false

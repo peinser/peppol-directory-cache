@@ -1,0 +1,79 @@
+name: 📦 Build & Distribute Helm Charts
+
+run-name: "⚡ ${{ github.actor }} is building & distributing Helm charts! 🚀"
+
+on:
+  workflow_call:
+    inputs:
+      all:
+        description: "🌍 Release all charts?"
+        type: boolean
+        required: false
+        default: true
+  workflow_dispatch:
+    inputs:
+      all:
+        description: "🌍 Release all charts?"
+        type: boolean
+        required: false
+        default: true
+  push:
+    paths:
+      - k8s/helm/charts/*/templates/**
+      - k8s/helm/charts/*/values.yaml
+      - k8s/helm/charts/*/Chart.yaml
+    tags:
+      - release/**
+
+jobs:
+  package:
+    runs-on:
+      group: on-prem
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # Shallow clone of current branch.
+          fetch-tags: false
+          ref: ${{ github.ref }}
+          sparse-checkout: |
+            k8s/helm
+          sparse-checkout-cone-mode: false
+
+      - name: 🎛️ Install Helm (v3.13.3)
+        uses: azure/setup-helm@v4
+        with:
+          version: '3.13.3' # Avoiding Helm 3.14 issues
+
+      - name: 🔑 Authenticate to OCI registry
+        run: |
+          echo '${{ secrets.OCI_REGISTRY_HARBOR_SECRET }}' | helm registry login -u '${{ secrets.OCI_REGISTRY_HARBOR_LOGIN }}' --password-stdin harbor.peinser.com/charge
+        env:
+          HELM_EXPERIMENTAL_OCI: 1
+
+      - name: 📦 Package & Publish Helm Charts
+        run: |
+          echo "🔍 Detecting charts to package..."
+
+          if [[ "${{ inputs.all }}" == "true" ]]; then
+            charts=$(find k8s/helm/charts -type d -maxdepth 1 -mindepth 1)
+          else
+            charts=$(git diff --name-only HEAD~1 | xargs --no-run-if-empty dirname | sort | uniq | { grep charts || true; } | { grep -v /templates || true; } | { grep -v /resources || true; })
+          fi
+
+          mkdir -p _packaged/
+
+          echo "📦 Packaging charts..."
+          echo "$charts" | grep -v "^$" | while read chart || [[ -n $chart ]]; do
+            echo "🚀 Packaging $chart..."
+            helm package --dependency-update "$chart" -d _packaged/
+          done
+
+          echo "🚢 Pushing Helm charts to OCI..."
+          ls _packaged | grep .tgz | while read package || [[ -n $package ]]; do
+            helm push _packaged/$package oci://harbor.peinser.com/charge/charts
+            echo "⬆️ Pushed $package" >> $GITHUB_STEP_SUMMARY
+          done
+
+          echo "✅ Helm charts successfully published! 🎉"

@@ -43,7 +43,7 @@ jobs:
       - name: 📦 Pull prerequisites image (if they exist)
         run: |
           version=${{ steps.details.outputs.version }}
-          docker pull harbor.peinser.com/library/peppol-cache:$version || true
+          docker pull harbor.peinser.com/library/peppol-directory-cache:$version || true
 
       - name: 🏗️ Build & Push Image
         run: |
@@ -51,10 +51,10 @@ jobs:
           echo "⚙️ Building image..."
           docker build \
             -f docker/Dockerfile \
-            -t harbor.peinser.com/library/peppol-cache:$version .
+            -t harbor.peinser.com/library/peppol-directory-cache:$version .
 
           echo "📤 Pushing image to registry..."
-          docker push harbor.peinser.com/library/peppol-cache:$version
+          docker push harbor.peinser.com/library/peppol-directory-cache:$version
 
-          echo "✅ Successfully pushed image: harbor.peinser.com/library/peppol-cache:$version"
-          echo "📦 Published: \`harbor.peinser.com/library/peppol-cache:$version\`" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Successfully pushed image: harbor.peinser.com/library/peppol-directory-cache:$version"
+          echo "📦 Published: \`harbor.peinser.com/library/peppol-directory-cache:$version\`" >> $GITHUB_STEP_SUMMARY
