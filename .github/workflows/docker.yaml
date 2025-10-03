@@ -1,0 +1,60 @@
+name: 🚀 Build & Distribute
+
+run-name: "🐳 ${{ github.actor }} is building & pushing a new image! 🛠️"
+
+on:
+  workflow_dispatch:
+  workflow_call:
+  push:
+    paths:
+      - src/charge/**
+      - docker/core/Dockerfile
+    tags:
+      - release/**
+
+jobs:
+  package:
+    runs-on:
+      group: on-prem
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # Shallow clone of current branch.
+          fetch-tags: false
+          ref: ${{ github.ref }}
+          sparse-checkout: |
+            docker/Dockerfile
+            nginx.conf
+            VERSION
+          sparse-checkout-cone-mode: false
+
+      - name: 📌 Extract application details
+        id: details
+        run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+
+      - name: 🔑 Authenticate to Container Registry
+        run: |
+          docker login harbor.peinser.com \
+            -u '${{ secrets.OCI_REGISTRY_HARBOR_LOGIN }}' \
+            -p '${{ secrets.OCI_REGISTRY_HARBOR_SECRET }}'
+
+      - name: 📦 Pull prerequisites image (if they exist)
+        run: |
+          version=${{ steps.details.outputs.version }}
+          docker pull harbor.peinser.com/library/peppol-cache:$version || true
+
+      - name: 🏗️ Build & Push Image
+        run: |
+          version=${{ steps.details.outputs.version }}
+          echo "⚙️ Building image..."
+          docker build \
+            -f docker/Dockerfile \
+            -t harbor.peinser.com/library/peppol-cache:$version .
+
+          echo "📤 Pushing image to registry..."
+          docker push harbor.peinser.com/library/peppol-cache:$version
+
+          echo "✅ Successfully pushed image: harbor.peinser.com/library/peppol-cache:$version"
+          echo "📦 Published: \`harbor.peinser.com/library/peppol-cache:$version\`" >> $GITHUB_STEP_SUMMARY

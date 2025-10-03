@@ -1,6 +1,6 @@
-ARG OPENRESTY_VERSION=1.25.3.1
+ARG OPENRESTY_VERSION=1.27.1.2
 
-FROM openresty/openresty:${OPENRESTY_VERSION}-bookworm
+FROM harbor.peinser.com/dockerhub/openresty/openresty:${OPENRESTY_VERSION}-bookworm
 
 LABEL maintainer="Joeri Hermans <joeri@peinser.com>"
 
