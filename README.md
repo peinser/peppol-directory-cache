@@ -13,7 +13,7 @@ We expect the cache requires a lot of refreshing in the upcoming months because 
 
 ## Why Use This Utility?
 
-- **Performance:** Reduces latency and load on the Peppol Directory by caching responses for repeated queries.
+- **Performance:** Reduces latency and load on the Peppol Directory by caching responses for repeated queries. Furthermore, the cache server is configured as to not stress the upstream server. In other words, the cache server handles the rate limiting to the Peppol directory. This can of course be configured. By default, we allow for 3 requests per second to the upstream.
 - **Reliability:** Mitigates rate limiting and service interruptions from the upstream directory.
 - **Correctness:** Ensures you generate the right UBL document type for each client, even as the Peppol landscape fragments.
 
