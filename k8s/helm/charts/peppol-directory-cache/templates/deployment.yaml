@@ -47,7 +47,7 @@ spec:
       initContainers:
       - name: set-cache-permissions
         image: harbor.peinser.com/dockerhub/busybox:1.36
-        command: ["sh", "-c", "chown -R 1001:1001 /var/cache/nginx && chmod -R 750 /var/cache/nginx"]
+        command: ["sh", "-c", "mkdir -p /var/cache/nginx && chown -R 1001:1001 /var/cache/nginx && chmod -R 750 /var/cache/nginx"]
         volumeMounts:
         - name: cache
           mountPath: /var/cache/nginx
