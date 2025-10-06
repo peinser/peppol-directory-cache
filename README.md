@@ -39,19 +39,19 @@ Query Peppol information for well-known companies:
 ### Belgian government (Company Number: 0203.201.340)
 
 ```bash
-curl -s "http://<your-cache-host>:8000?q=BE&q=0203201340"
+curl -s "http://<your-cache-host>:8000?country=BE&q=0203201340"
 ```
 
 ### KBC Bank NV (Company Number: 0403.227.515)
 
 ```bash
-curl -s "http://<your-cache-host>:8000?q=BE&q=0403227515"
+curl -s "http://<your-cache-host>:8000?country=BE&q=0403227515"
 ```
 
 ### Proximus NV (Company Number: 0202.239.951)
 
 ```bash
-curl -s "http://<your-cache-host>:8000?q=BE&q=0202239951"
+curl -s "http://<your-cache-host>:8000?country=BE&q=0202239951"
 ```
 
 
