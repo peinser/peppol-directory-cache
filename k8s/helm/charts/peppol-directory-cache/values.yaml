@@ -147,3 +147,14 @@ image:
   ## Enable development (debug) mode.
   ##
   debug: false
+## Volumes
+##
+volumes:
+  ## Storage cache configuration
+  ## This is necessary to ensure proper caching behaviour of the webserver.
+  cache:
+    enabled: false
+    existingClaim: null # Once set, this will override dynamic provisioning and the settings below.
+    accessMode: ReadWriteOnce  # ReadWriteMany is necessary for multiple replicas.
+    size: 10Gi
+    storageClass: longhorn-xfs-2-ssd

@@ -31,19 +31,27 @@ spec:
       restartPolicy: {{ .Values.defaults.restartPolicy }}
       {{ include "service.pullSecrets" $ | nindent 6 -}}
 
-      # volumes:
-      # - name: cache
-      #   configMap:
-      #     name: {{ printf "%s-cache" .Release.Name }}
-      #     items:
-      #     - key: cache.json
-      #       path: cache.json
-      # - name: oidc
-      #   configMap:
-      #     name: {{ printf "%s-oidc" .Release.Name }}
-      #     items:
-      #     - key: oidc.json
-      #       path: oidc.json
+      {{- if and .Values.volumes.cache.enabled (eq .Values.volumes.cache.existingClaim nil) }}
+      volumes:
+      - name: cache
+        persistentVolumeClaim:
+          claimName: {{ $.Release.Name }}-cache
+      {{- else if and .Values.volumes.cache.enabled .Values.volumes.cache.existingClaim }}
+      volumes:
+      - name: cache
+        persistentVolumeClaim:
+          claimName: {{ .Values.volumes.cache.existingClaim }}
+      {{- end }}
+
+      {{- if .Values.volumes.cache.enabled }}
+      initContainers:
+      - name: set-cache-permissions
+        image: harbor.peinser.com/dockerhub/busybox:1.36
+        command: ["sh", "-c", "chown -R 1001:1001 /var/cache/nginx && chmod -R 750 /var/cache/nginx"]
+        volumeMounts:
+        - name: cache
+          mountPath: /var/cache/nginx
+      {{- end }}
 
       containers:
 
@@ -59,14 +67,10 @@ spec:
         - containerPort: 8000
           protocol: TCP
 
-        # volumeMounts:
-        # - name: cache
-        #   readOnly: true
-        #   mountPath: /mnt/config/cache.json
-        #   subPath: cache.json
-        # - name: oidc
-        #   readOnly: true
-        #   mountPath: /mnt/config/oidc.json
-        #   subPath: oidc.json
+        {{- if .Values.volumes.cache.enabled }}
+        volumeMounts:
+        - name: cache
+          mountPath: /var/cache/nginx
+        {{- end }}
 
         {{- include "probes" $ | nindent 8 }}

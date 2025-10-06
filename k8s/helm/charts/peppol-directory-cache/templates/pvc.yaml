@@ -1,0 +1,13 @@
+{{- if and .Values.volumes.cache.enabled (eq .Values.volumes.cache.existingClaim nil) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $.Release.Name }}-cache
+spec:
+  accessModes:
+  - {{ .Values.volumes.cache.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.volumes.cache.size }}
+  storageClassName: {{ .Values.volumes.cache.storageClass }}
+{{- end }}
