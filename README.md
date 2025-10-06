@@ -21,6 +21,9 @@ We expect the cache requires a lot of refreshing in the upcoming months because 
 
 During invoice or credit-note generation, query the cache with parameters like `q=BE&q={CompanyNumber}`. The cache will return Peppol information for the specified company, including supported document types. This helps you select the correct UBL type for each transaction.
 
+> [!NOTE]
+> As a result, we support the same query parameters as outlined in the [Peppol Directory documentation](https://directory.peppol.eu/public/locale-en_US/menuitem-docs-rest-api).
+
 ## Caching Controls & Recommendations
 
 - **Write-through cache:** Responses are cached for a configurable period (default: 1 year for HTTP 200 responses).
