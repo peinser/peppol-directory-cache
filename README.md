@@ -3,13 +3,17 @@
 
 ## Overview
 
-Peppol Directory Cache is a lightweight caching proxy for the [Peppol Directory](https://directory.peppol.eu/search/1.0/json). It extracts Peppol Participant IDs and their registered document types, enabling fast, reliable lookups during invoice and credit-note generation.
+Peppol Directory Cache is a lightweight caching proxy for the [Peppol Directory](https://directory.peppol.eu/search/1.0/json).
+
+It extracts Peppol Participant IDs and their registered document types, enabling fast, reliable lookups during invoice and credit-note generation.
 
 > **Why is this increasingly important?**
 
-The Peppol landscape is rapidly evolving, with Access Points and participants adopting different document types, processes, and even legacy schemes. In the future, it will be essential to select the correct UBL document type and Participant ID for each client—some may only support specific types (e.g., credit-notes only), or use legacy scheme IDs such as `0208`. Failing to do so can result in undeliverable invoices or compliance issues. This fragmentation means services like this cache are critical for reliably determining what your client actually supports, ensuring seamless and correct electronic document exchange.
+The Peppol landscape is rapidly evolving, with Access Points and participants adopting different document types, processes, and even legacy schemes. In the future, it will be essential to select the correct UBL document type and Participant ID for each participant.
 
-We expect the cache requires a lot of refreshing in the upcoming months because it will take some time before companies settle with the proper Peppol provider, and of course, the longevity of the _many_ Peppol providers remains a big question as well of course. From this point of view, we recommend to _currently_ (in)validate the contents of the cache as required. In the future however, this will most likely change when things have settled.
+Some may only support specific types (e.g., credit-notes only), or use scheme IDs. Failing to do so can result in undeliverable invoices or compliance issues. This fragmentation means services like this cache are critical for reliably determining what your client actually supports, ensuring seamless and correct electronic document exchange.
+
+We expect the cache requires a lot of refreshing in the upcoming months because it will take some time before companies settle with the proper Peppol provider, and of course, the longevity of the _many_ Peppol providers remains a big question as well of course. From this point of view, we recommend to _currently_ (in)validate the contents of the cache as required. In the future however, this will most likely change when configurations have settled.
 
 ## Why Use This Utility?
 
