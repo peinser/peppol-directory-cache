@@ -1,46 +1,41 @@
-{{- $deployment := include "service.name" (dict "release" $.Release.Name "name" "peppol-directory-cache") }}
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: {{ include "service.name" (dict "release" $.Release.Name "name" "peppol-directory-cache") }}
   labels:
-    app: {{ $deployment }}
-  name: {{ $deployment }}
+    app: {{ include "service.name" (dict "release" $.Release.Name "name" "peppol-directory-cache") }}
+
 spec:
   replicas: {{ include "deploy.replicas" $.Values.replicas }}
   selector:
     matchLabels:
-      app: {{ $deployment }}
+      app: {{ include "service.name" (dict "release" $.Release.Name "name" "peppol-directory-cache") }}
+
   template:
+
     metadata:
       labels:
-        app: {{ $deployment }}
+        app: {{ include "service.name" (dict "release" $.Release.Name "name" "peppol-directory-cache") }}
         {{- if .Values.defaults.loki.enabled }}
         loki: {{ .Values.defaults.loki.tenant }}
         {{- end }}
+
     spec:
       automountServiceAccountToken: false
       securityContext:
         runAsUser: {{ .Values.defaults.securityContext.runAsUser }}
         runAsGroup: {{ .Values.defaults.securityContext.runAsGroup }}
         fsGroup: {{ .Values.defaults.securityContext.fsGroup }}
-
       {{- include "service.constraints" $ | nindent 6 }}
-
       dnsPolicy: {{ .Values.defaults.dnsPolicy }}
       restartPolicy: {{ .Values.defaults.restartPolicy }}
-      {{ include "service.pullSecrets" $ | nindent 6 -}}
+      {{- include "service.pullSecrets" $ | nindent 6 }}
 
-      {{- if and .Values.volumes.cache.enabled (eq .Values.volumes.cache.existingClaim nil) }}
+      {{- if .Values.volumes.cache.enabled }}
       volumes:
       - name: cache
         persistentVolumeClaim:
-          claimName: {{ $.Release.Name }}-cache
-      {{- else if and .Values.volumes.cache.enabled .Values.volumes.cache.existingClaim }}
-      volumes:
-      - name: cache
-        persistentVolumeClaim:
-          claimName: {{ .Values.volumes.cache.existingClaim }}
+          claimName: {{ .Values.volumes.cache.existingClaim | default (printf "%s-cache" $.Release.Name) }}
       {{- end }}
 
       {{- if .Values.volumes.cache.enabled }}
@@ -48,16 +43,19 @@ spec:
       - name: set-cache-permissions
         image: harbor.peinser.com/dockerhub/busybox:1.36
         command: ["sh", "-c", "mkdir -p /var/cache/nginx && chown -R 1001:1001 /var/cache/nginx && chmod -R 750 /var/cache/nginx"]
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
         volumeMounts:
         - name: cache
           mountPath: /var/cache/nginx
       {{- end }}
 
       containers:
-
-      - image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ include "image" $ }}
+      - name: {{ include "service.name" (dict "release" $.Release.Name "name" "peppol-directory-cache") }}
+        image: {{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ include "image" $ }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        name: {{ $deployment }}
+
         securityContext:
           allowPrivilegeEscalation: {{ .Values.defaults.securityContext.allowPrivilegeEscalation }}
           privileged: {{ .Values.defaults.securityContext.privileged }}
