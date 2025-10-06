@@ -1,0 +1,23 @@
+{
+	"name": "Peppol Directory Cache",
+	"dockerComposeFile": "../.dev/compose.yml",
+	"service": "app_peppol_cache",
+	"workspaceFolder": "/workspace",
+	"customizations": {
+		"settings": {},
+		"vscode": {
+			"extensions": [
+				"Tim-Koehler.helm-intellisense",
+				"github.vscode-github-actions",
+				"ms-azuretools.vscode-docker",
+				"ahmadalli.vscode-nginx-conf"
+			]
+		}
+	},
+
+	"postCreateCommand": "./.devcontainer/startup.sh",
+
+	"forwardPorts": [
+		8000
+	]
+}

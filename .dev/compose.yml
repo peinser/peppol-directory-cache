@@ -1,0 +1,22 @@
+services:
+
+  app_peppol_cache:
+    container_name: app-peppol-cache
+    build:
+      target: devcontainer
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    command: sleep infinity
+    environment:
+    - PEPPOL_DIRECTORY_BASE=https://directory.peppol.eu/search/1.0/json
+    ports:
+    - 8000:8000
+    volumes:
+    - ..:/workspace:cached
+    networks:
+    - peppol-cache
+
+
+networks:
+  peppol-cache:
+    driver: bridge
